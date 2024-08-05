@@ -16,7 +16,7 @@ public class ParkingService {
     private static final Logger logger = LogManager.getLogger("ParkingService");
 
     private static FareCalculatorService fareCalculatorService = new FareCalculatorService();
-
+    boolean resultVehicle =false;
     private InputReaderUtil inputReaderUtil;
     private ParkingSpotDAO parkingSpotDAO;
     private  TicketDAO ticketDAO;
@@ -45,7 +45,15 @@ public class ParkingService {
                 ticket.setInTime(inTime);
                 ticket.setOutTime(null);
                 ticketDAO.saveTicket(ticket);
+
+                if (ticketDAO.getNbTicket(vehicleRegNumber)==true)
+                {
+                    System.out.println("------------ vous etes deja venue ----------------");
+                }
+
+
                 System.out.println("Generated Ticket and saved in DB");
+
                 System.out.println("Please park your vehicle in spot number:"+parkingSpot.getId());
                 System.out.println("Recorded in-time for vehicle number:"+vehicleRegNumber+" is:"+inTime);
             }
@@ -103,11 +111,19 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
-            fareCalculatorService.calculateFare(ticket);
+            if (ticketDAO.getNbTicket(vehicleRegNumber)==true) {
+                fareCalculatorService.calculateFare(ticket,true);
+                System.out.println("yes poto, tiens 5% de remise");
+            }else {
+                fareCalculatorService.calculateFare(ticket,false);
+                System.out.println("1er fois qu'on voit ta face, 0 remise pour toi");
+            }
             if(ticketDAO.updateTicket(ticket)) {
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
+                ticketDAO.getNbTicket(vehicleRegNumber);
+
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
             }else{
