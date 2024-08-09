@@ -26,6 +26,7 @@ public class TicketDAO {
 
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
+        boolean result = false;
         try {
             con = dataBaseConfig.getConnection();
             PreparedStatement ps = con.prepareStatement(DBConstants.SAVE_TICKET);
@@ -37,15 +38,14 @@ public class TicketDAO {
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
 
-
-
-            return ps.execute();
+            int affect = ps.executeUpdate();
+            result = affect > 0;
         }catch (Exception ex){
-            logger.error("Error fetching next available slot",ex);
+            logger.error("Error fetching next available slot - saveTicket",ex);
         }finally {
             dataBaseConfig.closeConnection(con);
-            return false;
         }
+        return result;
     }
 
     public Ticket getTicket(String vehicleRegNumber) {
@@ -95,27 +95,7 @@ public class TicketDAO {
         }
         return false;
     }
-   /* public boolean getNbTicket(Ticket ticket){
-      /*  if (ticketDAO.getTicket(ticket.setVehicleRegNumber)== ticket.getVehicleRegNumber()){
-            return true;
-        }
-        else {
-            return false;
-        }
 
-        System.out.println(ticket.getVehicleRegNumber());
-
-        System.out.println(ticket.getId()+"    "+ticket.getVehicleRegNumber());
-
-        List<Ticket> toto = new ArrayList<Ticket>();
-        String truc = ticket.getVehicleRegNumber();
-        System.out.println(truc);
-
-
-
-
-        return false;
-    }*/
    public boolean getNbTicket(String vehicleRegNumber) {
        Connection con = null;
        boolean result = false;
@@ -129,19 +109,13 @@ public class TicketDAO {
            PreparedStatement ps = con.prepareStatement(query);
            ps.setString(1, vehicleRegNumber);
 
-           // Exécuter la requête
            ResultSet resultSet = ps.executeQuery();
 
-           // Vérifier si la chaîne existe
            if (resultSet.next() && resultSet.getInt(1) > 0) {
-               //System.out.println(vehicleRegNumber + " existe déjà dans la base de données.");
                result = true;
            } else {
-               // System.out.println(vehicleRegNumber + " n'existe pas dans la base de données.");
                result = false;
            }
-
-           // Fermer les ressources
            resultSet.close();
            ps.close();
            con.close();
