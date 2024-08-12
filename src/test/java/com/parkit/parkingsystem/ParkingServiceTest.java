@@ -108,34 +108,6 @@ public class ParkingServiceTest {
 
     }
 
-   /* @Test
-    public void processExitingVehicleTestUnableUpdate() {
-// modifier la methode pour envoyer une exception pour oder un meilleure test
-        //GIVEN
-
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
-        Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
-        ticket.setParkingSpot(parkingSpot);
-        ticket.setVehicleRegNumber("ABCDEF");
-        //parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
-
-        when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(false);
-        when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-
-        //WHEN
-        System.setOut(new PrintStream(outputStreamCaptor));
-        parkingService.processExitingVehicle();
-
-        //THEN
-        String allOutput = outputStreamCaptor.toString();
-        String[] lines = allOutput.split(System.lineSeparator());
-        String lastPrintedLine = lines[lines.length - 1];
-        String expectedOutput = "Unable to update ticket information. Error occurred";
-
-       assertEquals(expectedOutput, lastPrintedLine);
-    }*/
 
     @Test
     public void processExitingVehicleTestUnableUpdate() throws UpdateTicketException{

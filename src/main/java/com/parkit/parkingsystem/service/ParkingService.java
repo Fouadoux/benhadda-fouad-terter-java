@@ -106,7 +106,7 @@ public class ParkingService {
     }
 
     public void processExitingVehicle() throws UpdateTicketException{
-
+        
         try{
             String vehicleRegNumber = getVehichleRegNumber();
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);

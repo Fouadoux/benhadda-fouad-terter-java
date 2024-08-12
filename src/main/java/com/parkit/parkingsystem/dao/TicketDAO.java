@@ -22,8 +22,6 @@ public class TicketDAO {
 
     public DataBaseConfig dataBaseConfig = new DataBaseConfig();
 
-    List<String> tickets= new ArrayList<>();
-
     public boolean saveTicket(Ticket ticket){
         Connection con = null;
         boolean result = false;
@@ -86,7 +84,7 @@ public class TicketDAO {
             ps.setDouble(1, ticket.getPrice());
             ps.setTimestamp(2, new Timestamp(ticket.getOutTime().getTime()));
             ps.setInt(3,ticket.getId());
-            ps.execute();
+            ps.executeUpdate();
             return true;
         }catch (Exception ex){
             logger.error("Error saving ticket info",ex);
