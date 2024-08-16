@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -38,7 +39,7 @@ public class ParkingDataBaseIT {
     private static InputReaderUtil inputReaderUtil;
 
     @BeforeAll
-    public static void setUp() throws Exception{
+    public static void setUp() throws Exception {
         parkingSpotDAO = new ParkingSpotDAO();
         parkingSpotDAO.dataBaseConfig = dataBaseTestConfig;
         ticketDAO = new TicketDAO();
@@ -55,54 +56,45 @@ public class ParkingDataBaseIT {
     }
 
     @AfterAll
-    public static void tearDown(){
+    public static void tearDown() {
 
     }
 
     @Test
-    public void testParkingACar(){
-
+    public void testParkingACar() {
         //GIVEN
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
 
-
         //WHEN
         parkingService.processIncomingVehicle();
-        //TODO: check that a ticket is actualy saved in DB and Parking table is updated with availability
 
         //THEN
-        Ticket resultTicket  = ticketDAO.getTicket("ABCDEF");
-
+        Ticket resultTicket = ticketDAO.getTicket("ABCDEF");
         assertEquals(1, resultTicket.getId());
         assertEquals(1, resultTicket.getParkingSpot().getId());
         assertEquals(0, resultTicket.getPrice());
-        assertEquals(null,resultTicket.getOutTime());
-
+        assertEquals(null, resultTicket.getOutTime());
     }
 
     @Test
     public void testParkingLotExit() throws InterruptedException, Exception {
         //GIVEN
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, true);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
         parkingService.processIncomingVehicle();
-
         Thread.sleep(3000);
+
         //WHEN
         parkingService.processExitingVehicle();
 
-        //TODO: check that the fare generated and out time are populated correctly in the database
         // THEN
         Ticket resultTicket = ticketDAO.getTicket("ABCDEF");
-
         assertEquals(1, resultTicket.getId());
         assertEquals(1, resultTicket.getParkingSpot().getId());
         assertEquals(0, resultTicket.getPrice());
         assertNotNull(resultTicket.getOutTime());
     }
 
-   @Test
+    @Test
     public void testParkingLotExitRecurringUser() throws InterruptedException, Exception {
 
         LocalDateTime indateTime = LocalDateTime.of(2019, 8, 5, 14, 0);
@@ -120,33 +112,20 @@ public class ParkingDataBaseIT {
         ancientTicket.setVehicleRegNumber("ABCDEF");
         ancientTicket.setInTime(intimestamp);
         ancientTicket.setOutTime(outDtimestamp);
-        ancientTicket.setPrice(62620.19999999999);
-
-
+        ancientTicket.setPrice(6);
         ticketDAO.saveTicket(ancientTicket);
-        /*ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, true);
-        parkingSpotDAO.updateParking(parkingSpot);*/
-
-     //   ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
         ParkingService parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
         parkingService.processIncomingVehicle();
-
         Thread.sleep(3000);
+
         //WHEN
         parkingService.processExitingVehicle();
 
-        //TODO: check that the fare generated and out time are populated correctly in the database
         // THEN
         Ticket resultTicket = ticketDAO.getTicket("ABCDEF");
-
         assertEquals(2, resultTicket.getId());
         assertEquals(1, resultTicket.getParkingSpot().getId());
         assertEquals(0, resultTicket.getPrice());
         assertNotNull(resultTicket.getOutTime());
-
-
-
-
     }
 }

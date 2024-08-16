@@ -46,7 +46,7 @@ public class ParkingService {
                 ticket.setOutTime(null);
                 ticketDAO.saveTicket(ticket);
 
-                if (ticketDAO.getNbTicket(vehicleRegNumber)==true)
+                if (ticketDAO.hasRecentTickets(vehicleRegNumber)==true)
                 {
                     System.out.println("Heureux de vous revoir ! En tant qu’utilisateur régulier de notre parking, vous allez obtenir une remise de 5%");
                 }
@@ -112,26 +112,23 @@ public class ParkingService {
             Ticket ticket = ticketDAO.getTicket(vehicleRegNumber);
             Date outTime = new Date();
             ticket.setOutTime(outTime);
-            if (ticketDAO.getNbTicket(vehicleRegNumber)==true) {
+            if (ticketDAO.hasRecentTickets(vehicleRegNumber)==true) {
                 fareCalculatorService.calculateFare(ticket,true);
                 System.out.println("yes poto, tiens 5% de remise");
             }else {
                 fareCalculatorService.calculateFare(ticket,false);
                 System.out.println("1er fois qu'on voit ta face, 0 remise pour toi");
             }
-
             if (!ticketDAO.updateTicket(ticket)) {
                 System.out.println("Unable to update ticket information. Error occurred");
                 throw new UpdateTicketException("Unable to update ticket information. Error occurred");
             }
-
                 ParkingSpot parkingSpot = ticket.getParkingSpot();
                 parkingSpot.setAvailable(true);
                 parkingSpotDAO.updateParking(parkingSpot);
-                ticketDAO.getNbTicket(vehicleRegNumber);
+                ticketDAO.hasRecentTickets(vehicleRegNumber);
                 System.out.println("Please pay the parking fare:" + ticket.getPrice());
                 System.out.println("Recorded out-time for vehicle number:" + ticket.getVehicleRegNumber() + " is:" + outTime);
-
         } catch(Exception e){
             logger.error("Unable to process exiting vehicle",e);
             throw new UpdateTicketException(e.getMessage());

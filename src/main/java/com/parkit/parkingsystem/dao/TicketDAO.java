@@ -5,7 +5,6 @@ import com.parkit.parkingsystem.constants.DBConstants;
 import com.parkit.parkingsystem.constants.ParkingType;
 import com.parkit.parkingsystem.model.ParkingSpot;
 import com.parkit.parkingsystem.model.Ticket;
-import com.parkit.parkingsystem.service.ParkingService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -13,8 +12,6 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TicketDAO {
 
@@ -35,9 +32,8 @@ public class TicketDAO {
             ps.setDouble(3, ticket.getPrice());
             ps.setTimestamp(4, new Timestamp(ticket.getInTime().getTime()));
             ps.setTimestamp(5, (ticket.getOutTime() == null)?null: (new Timestamp(ticket.getOutTime().getTime())) );
-
-            int affect = ps.executeUpdate();
-            result = affect > 0;
+            ps.executeUpdate();
+            result = true;
         }catch (Exception ex){
             logger.error("Error fetching next available slot - saveTicket",ex);
         }finally {
@@ -64,7 +60,6 @@ public class TicketDAO {
                 ticket.setPrice(rs.getDouble(3));
                 ticket.setInTime(rs.getTimestamp(4));
                 ticket.setOutTime(rs.getTimestamp(5));
-
             }
             dataBaseConfig.closeResultSet(rs);
             dataBaseConfig.closePreparedStatement(ps);
@@ -94,21 +89,15 @@ public class TicketDAO {
         return false;
     }
 
-   public boolean getNbTicket(String vehicleRegNumber) {
+   public boolean hasRecentTickets(String vehicleRegNumber) {
        Connection con = null;
        boolean result = false;
-
        try {
-           // Établir la connexion
            con = dataBaseConfig.getConnection();
-           // Connection connection = DriverManager.getConnection(url, user, password);
            String query = "SELECT COUNT(*) FROM ticket WHERE VEHICLE_REG_NUMBER = ? AND OUT_TIME < DATE_SUB(NOW(), INTERVAL 24 HOUR)";
-
            PreparedStatement ps = con.prepareStatement(query);
            ps.setString(1, vehicleRegNumber);
-
            ResultSet resultSet = ps.executeQuery();
-
            if (resultSet.next() && resultSet.getInt(1) > 0) {
                result = true;
            } else {
@@ -117,12 +106,9 @@ public class TicketDAO {
            resultSet.close();
            ps.close();
            con.close();
-
        } catch (Exception e) {
            e.printStackTrace();
        }
-
        return result;
-
    }
 }

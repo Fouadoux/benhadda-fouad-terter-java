@@ -20,8 +20,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.sql.*;
 import java.util.Date;
 
-import static junit.framework.Assert.*;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -39,6 +39,7 @@ public class TicketDAOTest {
 
     @Mock
     private PreparedStatement preparedStatement;
+
     @Mock
     private ResultSet resultSet;
 
@@ -101,7 +102,6 @@ public class TicketDAOTest {
         assertEquals(vehicleRegNumber, ticketTest.getVehicleRegNumber());
         assertEquals(1, ticketTest.getParkingSpot().getId());
         assertEquals(ParkingType.CAR, ticketTest.getParkingSpot().getParkingType());
-
     }
 
     @Test

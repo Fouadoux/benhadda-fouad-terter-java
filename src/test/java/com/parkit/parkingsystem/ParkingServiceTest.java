@@ -15,12 +15,10 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
-
 import java.util.Date;
 
-import static junit.framework.Assert.assertEquals;
+//import static junit.framework.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
@@ -37,50 +35,32 @@ public class ParkingServiceTest {
     @Mock
     private static TicketDAO ticketDAO;
 
-
-
-
-
-
-
     @BeforeEach
     public void setUpPerTest() {
 
 
         try {
-               lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
-
-           /*ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
-            Ticket ticket = new Ticket();
-            ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
-            ticket.setParkingSpot(parkingSpot);
-            ticket.setVehicleRegNumber("ABCDEF");
-            when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
-            when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);*/
-
-
+            lenient().when(inputReaderUtil.readVehicleRegistrationNumber()).thenReturn("ABCDEF");
             parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
         } catch (Exception e) {
             e.printStackTrace();
-            throw  new RuntimeException("Failed to set up test mock objects");
+            throw new RuntimeException("Failed to set up test mock objects");
         }
     }
 
     @Test
-    public void processExitingVehicleTest() throws Exception{
+    public void processExitingVehicleTest() throws Exception {
 
         //GIVEN
-
-        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR,false);
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
         Ticket ticket = new Ticket();
-        ticket.setInTime(new Date(System.currentTimeMillis() - (60*60*1000)));
+        ticket.setInTime(new Date(System.currentTimeMillis() - (60 * 60 * 1000)));
         ticket.setParkingSpot(parkingSpot);
         ticket.setVehicleRegNumber("ABCDEF");
         when(ticketDAO.getTicket(anyString())).thenReturn(ticket);
         when(ticketDAO.updateTicket(any(Ticket.class))).thenReturn(true);
         when(parkingSpotDAO.updateParking(any(ParkingSpot.class))).thenReturn(true);
-        when(ticketDAO.getNbTicket(anyString())).thenReturn(false);
-       // parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
+        when(ticketDAO.hasRecentTickets(anyString())).thenReturn(false);
 
         //WHEN
         parkingService.processExitingVehicle();
@@ -95,8 +75,6 @@ public class ParkingServiceTest {
 
         when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
         when(inputReaderUtil.readSelection()).thenReturn(1);
-       // parkingService = new ParkingService(inputReaderUtil, parkingSpotDAO, ticketDAO);
-
         //WHEN
 
         parkingService.processIncomingVehicle();
@@ -110,7 +88,7 @@ public class ParkingServiceTest {
 
 
     @Test
-    public void processExitingVehicleTestUnableUpdate() throws UpdateTicketException{
+    public void processExitingVehicleTestUnableUpdate() throws UpdateTicketException {
         //GIVEN
 
         ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
@@ -127,19 +105,18 @@ public class ParkingServiceTest {
     }
 
 
-
-   @Test
+    @Test
     public void getNextParkingNumberIfAvailable() throws Exception {
-       //GIVEN
+        //GIVEN
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(1);
-        ParkingSpot parkingSpot =new ParkingSpot(1,ParkingType.CAR,true);
-       //WHEN
-       parkingService.getNextParkingNumberIfAvailable();
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, true);
+        //WHEN
+        parkingService.getNextParkingNumberIfAvailable();
 
-       //THEN
-       assertEquals(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR),1);
-       assertEquals(parkingSpot.isAvailable(), true);
+        //THEN
+        assertEquals(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR), 1);
+        assertEquals(parkingSpot.isAvailable(), true);
     }
 
     @Test
@@ -148,7 +125,7 @@ public class ParkingServiceTest {
         //GIVEN
         when(inputReaderUtil.readSelection()).thenReturn(1);
         when(parkingSpotDAO.getNextAvailableSlot(ParkingType.CAR)).thenReturn(-1);
-        ParkingSpot parkingSpot =new ParkingSpot(1,ParkingType.CAR,false);
+        ParkingSpot parkingSpot = new ParkingSpot(1, ParkingType.CAR, false);
 
         //WHEN & THEN
         Exception thrown = assertThrows(Exception.class, () -> parkingService.getNextParkingNumberIfAvailable());
@@ -157,7 +134,7 @@ public class ParkingServiceTest {
     }
 
     @Test
-    public void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument()  {
+    public void testGetNextParkingNumberIfAvailableParkingNumberWrongArgument() {
         //GIVEN
         when(inputReaderUtil.readSelection()).thenReturn(3);
 
